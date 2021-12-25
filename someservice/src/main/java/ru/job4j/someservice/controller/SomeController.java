@@ -1,13 +1,15 @@
 package ru.job4j.someservice.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.someservice.model.Passport;
 import ru.job4j.someservice.service.SomeService;
 
 import java.util.List;
 
-
+@EnableScheduling
 @RestController
 @RequestMapping("/some")
 public class SomeController {
@@ -48,9 +50,10 @@ public class SomeController {
         return someService.removePassport(id);
     }
 
+    @Scheduled(fixedDelay = 20000)
     @GetMapping("/not-active")
-    public List<Passport> findNotActivePassports() {
-        return someService.findNotActivePassports();
+    public void findNotActivePassports() {
+        someService.findNotActivePassports();
     }
 
     @GetMapping("/change-soon")
