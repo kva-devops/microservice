@@ -1,5 +1,6 @@
 package ru.job4j.someservice.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -17,7 +18,8 @@ public class SomeService {
 
     private final RestTemplate client;
 
-    private final String url = "http://localhost:8080/passport";
+    @Value("${url.passport.service}")
+    private String url;
 
     public SomeService(RestTemplate client) {
         this.client = client;
@@ -58,10 +60,10 @@ public class SomeService {
     public boolean changePassport(int id, Passport passport) {
         return client.exchange(
                 url + "/update/" + id,
-                HttpMethod.PATCH,
+                HttpMethod.PUT,
                 new HttpEntity<>(passport),
                 Void.class
-        ).getStatusCode() != HttpStatus.NOT_FOUND;
+        ).getStatusCode() == HttpStatus.OK;
     }
 
     public boolean removePassport(int id) {
@@ -70,7 +72,7 @@ public class SomeService {
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
                 Void.class
-        ).getStatusCode() != HttpStatus.NOT_FOUND;
+        ).getStatusCode() == HttpStatus.OK;
     }
 
     public List<Passport> findNotActivePassports() {

@@ -1,9 +1,6 @@
 package ru.job4j.microservice.service;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.microservice.model.Passport;
 import ru.job4j.microservice.repositories.PassportRepository;
 
@@ -30,42 +27,26 @@ public class PassportService {
         ).collect(Collectors.toList());
     }
 
-    public ResponseEntity<Passport> findById(int id) {
-        var passport = this.passportRepository.findById(id);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport.get());
+    public Optional<Passport> findById(int id) {
+        return this.passportRepository.findById(id);
     }
 
 
-    public ResponseEntity<Passport> findBySeries(String series) {
-        var passport = this.passportRepository.findBySeries(series);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport.get());
+    public Optional<Passport> findBySeries(String series) {
+        return this.passportRepository.findBySeries(series);
     }
 
 
-    public ResponseEntity<Passport> create(Passport passport) {
+    public Passport create(Passport passport) {
         Passport buff =  Passport.of(
                 passport.getName(),
                 passport.getSurname(),
                 passport.getBirthday());
-        this.passportRepository.save(buff);
-        return new ResponseEntity<>(
-                buff,
-                HttpStatus.CREATED
-        );
+        return this.passportRepository.save(buff);
     }
 
 
-    public ResponseEntity<Void> update(int id, Passport passport) throws InvocationTargetException, IllegalAccessException {
+    public void update(int id, Passport passport) throws InvocationTargetException, IllegalAccessException {
         var current = passportRepository.findById(id);
         if (current.isEmpty()) {
             throw new NullPointerException("Passport with this id not found");
@@ -93,17 +74,13 @@ public class PassportService {
             }
         }
         passportRepository.save(buffPassport);
-        return ResponseEntity.ok().build();
     }
 
 
-    public ResponseEntity<Void> delete(int id) {
+    public Optional<Passport> delete(int id) {
         Optional<Passport> passport = this.passportRepository.findById(id);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
         this.passportRepository.delete(passport.get());
-        return ResponseEntity.ok().build();
+        return passport;
     }
 
     public List<Passport> findUnavailable() {

@@ -38,7 +38,7 @@ public class SomeController {
         return someService.createNewPassport(passport);
     }
 
-    @PatchMapping("/change/{id}")
+    @PutMapping("/change/{id}")
     public boolean changePassport(@PathVariable int id, @RequestBody Passport passport) {
         return someService.changePassport(id, passport);
     }
