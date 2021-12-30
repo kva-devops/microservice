@@ -15,7 +15,6 @@ import java.util.stream.StreamSupport;
 @Service
 public class PassportService {
 
-
     private final PassportRepository passportRepository;
 
     public PassportService(PassportRepository passportRepository) {
@@ -32,11 +31,9 @@ public class PassportService {
         return this.passportRepository.findById(id);
     }
 
-
     public Optional<Passport> findBySeries(String series) {
         return this.passportRepository.findBySeries(series);
     }
-
 
     public Passport create(Passport passport) {
         Passport buff =  Passport.of(
@@ -45,7 +42,6 @@ public class PassportService {
                 passport.getBirthday());
         return this.passportRepository.save(buff);
     }
-
 
     public void update(int id, Passport passport) throws InvocationTargetException, IllegalAccessException {
         var current = passportRepository.findById(id);
@@ -77,10 +73,9 @@ public class PassportService {
         passportRepository.save(buffPassport);
     }
 
-
     public Optional<Passport> delete(int id) {
         Optional<Passport> passport = this.passportRepository.findById(id);
-        this.passportRepository.delete(passport.get());
+        passport.ifPresent(this.passportRepository::delete);
         return passport;
     }
 
