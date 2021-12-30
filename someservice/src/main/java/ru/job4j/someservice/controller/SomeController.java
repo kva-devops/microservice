@@ -50,7 +50,7 @@ public class SomeController {
         return someService.removePassport(id);
     }
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedDelay = 30000)
     @GetMapping("/not-active")
     public void findNotActivePassports() {
         someService.findNotActivePassports();

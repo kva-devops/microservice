@@ -12,7 +12,7 @@ import ru.job4j.microservice.config.KafkaTopicConfig;
         KafkaProducerConfig.class, KafkaTopicConfig.class
 })
 @DirtiesContext
-@EmbeddedKafka
+@EmbeddedKafka(partitions = 1)
 
 class MicroserviceApplicationTests {
     static {
