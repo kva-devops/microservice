@@ -2,7 +2,6 @@ package ru.job4j.someservice.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.someservice.model.Passport;
 import ru.job4j.someservice.service.SomeService;
@@ -50,7 +49,6 @@ public class SomeController {
         return someService.removePassport(id);
     }
 
-    @Scheduled(fixedDelay = 30000)
     @GetMapping("/not-active")
     public void findNotActivePassports() {
         someService.findNotActivePassports();

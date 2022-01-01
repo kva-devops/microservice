@@ -23,5 +23,4 @@ class MicroserviceApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
