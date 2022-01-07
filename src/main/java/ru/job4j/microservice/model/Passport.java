@@ -40,6 +40,21 @@ public class Passport {
         return passport;
     }
 
+    public Passport() {
+    }
+
+    public Passport(String series, String number,
+                    String name, String surname,
+                    Timestamp birthday, Timestamp dateOfIssue, Timestamp validityPeriod) {
+        this.series = series;
+        this.number = number;
+        this.name = name;
+        this.surname = surname;
+        this.birthday = birthday;
+        this.dateOfIssue = dateOfIssue;
+        this.validityPeriod = validityPeriod;
+    }
+
     private static String genSeries() {
         int length = 4;
         return RandomStringUtils.random(length, false, true);
