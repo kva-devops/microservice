@@ -2,19 +2,35 @@
 [![Build Status](https://app.travis-ci.com/kva-devops/microservice.svg?branch=master)](https://app.travis-ci.com/kva-devops/microservice)
 
 ## О проекте
+#### Описание
 Учебный проект - Микросервисы.
 Решаемые задачи:
 Асинхронное взаимодействие сервисов через брокер сообщений Kafka.
 Взаимодействие рассматривается на примере приложения, работающего с базой данных паспортов.
 
 Основная цель:
-При появлении в базе данных паспорта с истёкшим сроком действия, модуль Mircoservice, отправляет
-сообщение в тему "mail" брокера Kafka. Модуль Mail отслеживает данную тему и при появлении нового
+Проект состоит из трех микросервисов: *microservice*, *someservice*, *mail*. 
+При появлении в базе данных паспорта с истёкшим сроком действия, модуль *mircoservice*, отправляет
+сообщение в тему "mail" брокера Kafka. Модуль *mail* отслеживает данную тему и при появлении нового
 сообщения посылает уведомление об истёкшем сроке действия (функционал упрощен).
-Управление приложением осуществляется через модуль Someservice, все управляющие запросы идут от данного модуля.
+Управление приложением осуществляется через модуль *someservice*, все управляющие запросы идут от данного модуля.
+
+#### Технологии
+>JDK14, Maven, PostgreSQL, Liquibase, Spring Boot (Web, Data, Kafka), Java Servlet, Microservices, Kafka, Zookeeper
 
 ## Сборка 
-JDK14, Maven, Spring Boot, PostgreSQL, Liquibase, Kafka
+0. Убедиться, что на хосте запущены службы Zookeeper и Kafka: 
+`sudo systemctl start zookeeper`
+`sudo systemctl start kafka`
+1. Скачать исходные файлы проекта с репозитория GitHub
+2. Собрать микросервисы: 
+    -microservice `mvn install`
+    -someservice `mvn package spring-boot:repackage`
+    -mail `mvn package spring-boot:repackage`
+3. Запускаем микросервисы в отдельных терминалах:
+    `java -jar target/microservice-1.0.jar`
+    `java -jar someservice/target/someservice-1.0-exec.jar`
+    `java -jar mail/target/mail-1.0.jar`
 
 ## Как пользоваться 
 Заполняем базу данных необходимым количеством записей.
