@@ -1,5 +1,9 @@
 package ru.job4j.microservice.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.RandomStringUtils;
 
 import javax.persistence.*;
@@ -7,8 +11,15 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Model of passport
+ */
 @Entity
 @Table(name = "passports")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Passport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,98 +51,32 @@ public class Passport {
         return passport;
     }
 
-    public Passport() {
-    }
-
-    public Passport(String series, String number,
-                    String name, String surname,
-                    Timestamp birthday, Timestamp dateOfIssue, Timestamp validityPeriod) {
-        this.series = series;
-        this.number = number;
-        this.name = name;
-        this.surname = surname;
-        this.birthday = birthday;
-        this.dateOfIssue = dateOfIssue;
-        this.validityPeriod = validityPeriod;
-    }
-
+    /**
+     * Method for generating random series of passport
+     * @return series of passport (String)
+     */
     private static String genSeries() {
         int length = 4;
         return RandomStringUtils.random(length, false, true);
     }
 
+    /**
+     * Method for generating random number of passport
+     * @return number of passport (String)
+     */
     private static String genNumbers() {
         int length = 8;
         return RandomStringUtils.random(length, false, true);
     }
 
+    /**
+     * Method for calculating validity period of passport
+     * @param dateOfIssue - date of issue passport (Timestamp)
+     * @return expiration date of passport (Timestamp)
+     */
     private static Timestamp calcValidityPeriod(Timestamp dateOfIssue) {
-        LocalDate buff = dateOfIssue.toLocalDateTime().toLocalDate().plusYears(10);
-        return Timestamp.valueOf(buff.atStartOfDay());
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getSeries() {
-        return series;
-    }
-
-    public void setSeries(String series) {
-        this.series = series;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public Timestamp getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Timestamp birthday) {
-        this.birthday = birthday;
-    }
-
-    public Timestamp getDateOfIssue() {
-        return dateOfIssue;
-    }
-
-    public void setDateOfIssue(Timestamp dateOfIssue) {
-        this.dateOfIssue = dateOfIssue;
-    }
-
-    public Timestamp getValidityPeriod() {
-        return validityPeriod;
-    }
-
-    public void setValidityPeriod(Timestamp validityPeriod) {
-        this.validityPeriod = validityPeriod;
+        LocalDate expirationLocalDate = dateOfIssue.toLocalDateTime().toLocalDate().plusYears(10);
+        return Timestamp.valueOf(expirationLocalDate.atStartOfDay());
     }
 
     @Override

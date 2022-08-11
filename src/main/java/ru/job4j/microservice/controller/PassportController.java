@@ -1,5 +1,8 @@
 package ru.job4j.microservice.controller;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,78 +15,87 @@ import ru.job4j.microservice.service.PassportService;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+/**
+ * Controller for working "Passport" models
+ */
 @RestController
 @RequestMapping("/passport")
+@RequiredArgsConstructor
 public class PassportController {
-
-    @Autowired
-    private KafkaTemplate<Integer, String> kafkaTemplate;
 
     private final PassportService passportService;
 
-    public PassportController(PassportService passportService) {
-        this.passportService = passportService;
-    }
-
+    /**
+     * GET method for getting all passports
+     * @return List of passports
+     */
     @GetMapping("/find")
     public List<Passport> findAll() {
         return passportService.findAll();
     }
 
+    /**
+     * GET method for getting passport by passport ID
+     * @param id passport ID
+     * @return object of Passport
+     */
     @GetMapping("/find/{id}")
-    public ResponseEntity<Passport> findById(@PathVariable int id) {
-        var passport = passportService.findById(id);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport.get());
+    public Passport findById(@PathVariable int id) {
+        return passportService.findById(id);
     }
 
+    /**
+     * GET method for getting passport by series of passport
+     * @param series - series of passport
+     * @return object of Passport
+     */
     @GetMapping("/find/series/{series}")
-    public ResponseEntity<Passport> findBySeries(@PathVariable String series) {
-        var passport = this.passportService.findBySeries(series);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
-                return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport.get());
+    public Passport findBySeries(@PathVariable String series) {
+        return passportService.findBySeries(series);
     }
 
+    /**
+     * POST method for adding new passport
+     * @param passport - object of Passport
+     * @return created object of Passport
+     */
     @PostMapping("/save")
-    public ResponseEntity<Passport> create(@RequestBody Passport passport) {
-        return new ResponseEntity<>(
-                passportService.create(passport),
-                HttpStatus.CREATED
-        );
+    public Passport create(@RequestBody Passport passport) {
+        return passportService.create(passport);
     }
 
+    /**
+     * PUT method for updating passport
+     * @param id passport ID
+     * @param passport object of Passport
+     */
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Passport passport) throws InvocationTargetException, IllegalAccessException {
+    public void update(@PathVariable int id, @RequestBody Passport passport) throws InvocationTargetException, IllegalAccessException {
         passportService.update(id, passport);
-        return ResponseEntity.ok().build();
     }
 
+    /**
+     * DELETE method for deleting passport
+     * @param id passport ID
+     */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        var passport = passportService.delete(id);
-        if (passport.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
-        }
-        return ResponseEntity.ok().build();
+    public void delete(@PathVariable int id) {
+        passportService.delete(id);
     }
 
+    /**
+     * GET method for getting unavailable passport
+     * @return List of unavailable passports
+     */
     @GetMapping("/unavailable")
     public List<Passport> findUnavailable() {
-        List<Passport> result = passportService.findUnavailable();
-        if (!result.isEmpty()) {
-            kafkaTemplate.send("mail", "send notify");
-        }
-        return result;
+        return passportService.findUnavailable();
     }
 
+    /**
+     * GET method for getting passports which expire in the next 3 months
+     * @return List of Passports
+     */
     @GetMapping("/replaceable")
     public List<Passport> findReplaceable() {
         return passportService.findReplaceable();

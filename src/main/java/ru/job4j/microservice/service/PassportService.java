@@ -1,6 +1,11 @@
 package ru.job4j.microservice.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.microservice.model.Passport;
 import ru.job4j.microservice.repositories.PassportRepository;
 
@@ -12,14 +17,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Main business logic for working with Passport models
+ */
 @Service
+@RequiredArgsConstructor
 public class PassportService {
 
+    /**
+     * DAO for Passport
+     */
     private final PassportRepository passportRepository;
 
-    public PassportService(PassportRepository passportRepository) {
-        this.passportRepository = passportRepository;
-    }
+    private final KafkaTemplate<Integer, String> kafkaTemplate;
 
     public List<Passport> findAll() {
         return StreamSupport.stream(
@@ -27,20 +37,28 @@ public class PassportService {
         ).collect(Collectors.toList());
     }
 
-    public Optional<Passport> findById(int id) {
-        return this.passportRepository.findById(id);
+    public Passport findById(int passportId) {
+        var passport = passportRepository.findById(passportId);
+        if (passport.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
+        }
+        return passport.get();
     }
 
-    public Optional<Passport> findBySeries(String series) {
-        return this.passportRepository.findBySeries(series);
+    public Passport findBySeries(String series) {
+        var passport = passportRepository.findBySeries(series);
+        if (passport.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
+        }
+        return passport.get();
     }
 
     public Passport create(Passport passport) {
-        Passport buff =  Passport.of(
+        Passport createdPassport =  Passport.of(
                 passport.getName(),
                 passport.getSurname(),
                 passport.getBirthday());
-        return this.passportRepository.save(buff);
+        return passportRepository.save(createdPassport);
     }
 
     public void update(int id, Passport passport) throws InvocationTargetException, IllegalAccessException {
@@ -73,21 +91,31 @@ public class PassportService {
         passportRepository.save(buffPassport);
     }
 
-    public Optional<Passport> delete(int id) {
-        Optional<Passport> passport = this.passportRepository.findById(id);
-        passport.ifPresent(this.passportRepository::delete);
-        return passport;
+    public Passport delete(int passportId) {
+        Optional<Passport> passport = this.passportRepository.findById(passportId);
+        if (passport.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found");
+        }
+        passport.ifPresent(passportRepository::delete);
+        return passport.get();
     }
 
     public List<Passport> findUnavailable() {
-        return StreamSupport.stream(
+        List<Passport> unavailablePassportsList = StreamSupport.stream(
                 this.passportRepository.findUnavailable().spliterator(), false
         ).collect(Collectors.toList());
+        // add validation
+        if (!unavailablePassportsList.isEmpty()) {
+            kafkaTemplate.send("mail", "send notify");
+        }
+        return unavailablePassportsList;
     }
 
     public List<Passport> findReplaceable() {
-        return StreamSupport.stream(
-                this.passportRepository.findReplaceable().spliterator(), false
+        List<Passport> replaceablePassportsList = StreamSupport.stream(
+                passportRepository.findReplaceable().spliterator(), false
         ).collect(Collectors.toList());
+        // add validation
+        return replaceablePassportsList;
     }
 }
