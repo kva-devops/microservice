@@ -1,5 +1,7 @@
 package ru.job4j.someservice.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.RandomStringUtils;
 
 import javax.persistence.*;
@@ -9,6 +11,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "documents")
+@Getter
+@Setter
 public class Passport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,70 +57,6 @@ public class Passport {
     private static Timestamp calcValidityPeriod(Timestamp dateOfIssue) {
         LocalDate buff = dateOfIssue.toLocalDateTime().toLocalDate().plusYears(10);
         return Timestamp.valueOf(buff.atStartOfDay());
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getSeries() {
-        return series;
-    }
-
-    public void setSeries(String series) {
-        this.series = series;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public Timestamp getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Timestamp birthday) {
-        this.birthday = birthday;
-    }
-
-    public Timestamp getDateOfIssue() {
-        return dateOfIssue;
-    }
-
-    public void setDateOfIssue(Timestamp dateOfIssue) {
-        this.dateOfIssue = dateOfIssue;
-    }
-
-    public Timestamp getValidityPeriod() {
-        return validityPeriod;
-    }
-
-    public void setValidityPeriod(Timestamp validityPeriod) {
-        this.validityPeriod = validityPeriod;
     }
 
     @Override

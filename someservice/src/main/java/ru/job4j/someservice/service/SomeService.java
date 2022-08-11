@@ -5,7 +5,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.job4j.someservice.model.Passport;
@@ -13,6 +12,9 @@ import ru.job4j.someservice.model.Passport;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Business logic
+ */
 @Service
 public class SomeService {
 
@@ -25,64 +27,91 @@ public class SomeService {
         this.client = client;
     }
 
-    public ResponseEntity<Passport> getPassportById(int id) {
-        Passport passport = client
-                .getForObject(url + "/find/" + id, Passport.class);
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport);
+    /**
+     * Method for getting passport by passport ID
+     * @param id - passport ID
+     * @return object of Passport
+     */
+    public Passport getPassportById(int id) {
+        return client.getForObject(url + "/find/" + id, Passport.class);
     }
 
-    public ResponseEntity<Passport> getPassportBySeries(String series) {
-        Passport passport = client.getForObject(
-                url + "/find/series/" + series,
-                Passport.class
-        );
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Content-Type", "application/json")
-                .body(passport);
+    /**
+     * Method for getting passport by series of passport
+     * @param series - series of passport (String)
+     * @return object of Passport
+     */
+    public Passport getPassportBySeries(String series) {
+        return client.getForObject(url + "/find/series/" + series, Passport.class);
     }
 
+    /**
+     * Method for getting all passports
+     * @return List of passports
+     */
     public List<Passport> allPassport() {
         return getList(url + "/find");
     }
 
-    public ResponseEntity<Passport> createNewPassport(Passport passport) {
-        Passport buff = client.postForEntity(
-                url + "/save", passport, Passport.class
-        ).getBody();
-        return new ResponseEntity<>(
-                buff,
-                HttpStatus.CREATED
-        );
+    /**
+     * Method for creating new passport
+     * @param passport - object of Passport
+     * @return object of Passport
+     */
+    public Passport createNewPassport(Passport passport) {
+        return client.postForEntity(url + "/save", passport, Passport.class).getBody();
     }
 
-    public boolean changePassport(int id, Passport passport) {
+    /**
+     * Method for updating passport
+     * @param passportId - passport ID
+     * @param passport - object of Passport
+     * @return boolean result of updating
+     */
+    public boolean changePassport(int passportId, Passport passport) {
         return client.exchange(
-                url + "/update/" + id,
+                url + "/update/" + passportId,
                 HttpMethod.PUT,
                 new HttpEntity<>(passport),
                 Void.class
         ).getStatusCode() == HttpStatus.OK;
     }
 
-    public boolean removePassport(int id) {
+    /**
+     * Method for removing passport by passport ID
+     * @param passportId - passport ID
+     * @return boolean result of deleting
+     */
+    public boolean removePassport(int passportId) {
         return client.exchange(
-                url + "/delete/" + id,
+                url + "/delete/" + passportId,
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
                 Void.class
         ).getStatusCode() == HttpStatus.OK;
     }
 
+    /**
+     * Method for getting not active passports
+     * @return List of passports
+     */
     public List<Passport> findNotActivePassports() {
         return getList(url + "/unavailable");
     }
 
+    /**
+     * Method for getting which will soon need to be changed
+     * @return List of passports
+     */
     public List<Passport> findChangeSoonPassports() {
         return getList(url + "/replaceable");
     }
 
+    /**
+     * Private method for getting lists of passports from different links
+     * @param url - link (String)
+     * @return List of passports
+     */
     private List<Passport> getList(String url) {
         List<Passport> body = client.exchange(
                 url, HttpMethod.GET, null,
