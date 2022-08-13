@@ -1,14 +1,7 @@
 package ru.job4j.microservice.controller;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.microservice.model.Passport;
 import ru.job4j.microservice.service.PassportService;
 
